@@ -1,6 +1,8 @@
 extends PanelContainer
+## Componente de interfaz tipo acordeón que representa un elemento de cápsula en el selector.
+## Muestra el estado (Bloqueado, Disponible, Completada), el puntaje récord,
+## y permite desplegar la descripción y botones para estudiar o practicar la cápsula.
 
-# Referencias a los nodos hijos según tu estructura .tscn
 @onready var label_titulo = $MarginContainer/VBoxHeader/HBoxContainer/VBoxContainer/LabelTitulo
 @onready var label_Subtitulo = $MarginContainer/VBoxHeader/HBoxContainer/VBoxContainer/Subtitulo
 @onready var label_estado = $MarginContainer/VBoxHeader/HBoxContainer/VBoxDerecha/HBoxStatus/PanelContainer/MarginContainer/Estado
@@ -16,19 +18,16 @@ extends PanelContainer
 var id_capsula: int = -1
 
 func _ready() -> void:
-	# Ajustar el punto de pivote al centro de la textura para que gire sobre su propio eje
 	if boton_chevron.texture_normal:
 		boton_chevron.pivot_offset = boton_chevron.texture_normal.get_size() / 2
 		
-	# 1. Por defecto, ocultamos la parte desplegable (acordeón cerrado)
 	contenedor_desplegable.visible = false
 	
-	# 2. Conectamos las señales de los botones
 	boton_chevron.pressed.connect(_on_chevron_pressed)
 	boton_estudiar.pressed.connect(_on_estudiar_pressed)
 	boton_practicar.pressed.connect(_on_practicar_pressed)
 
-# Llena la información de la cápsula dinámicamente desde el manager
+## Configura visualmente los datos de la cápsula (título, subtítulo, estado, icono y récord).
 func configurar(datos: Dictionary) -> void:
 	if not is_node_ready():
 		await ready
@@ -40,7 +39,6 @@ func configurar(datos: Dictionary) -> void:
 	label_Subtitulo.text = datos["subtitulo"]
 	rich_text_mini_desc.text = datos["mini_descripcion"]
 	
-	# Carga de icono dinámico garantizado para exportaciones APK
 	icon_rect.texture = CapsulaManager.obtener_icono_capsula(id_capsula)
 	
 	if datos["estado"] == "Bloqueado":
@@ -71,25 +69,25 @@ func configurar(datos: Dictionary) -> void:
 		panel_estado.theme_type_variation = &"PanelVarianteVerde"
 		modulate = Color(1.0, 1.0, 1.0, 1.0)
 
-# Alterna la visibilidad del acordeón con animación del chevron
+## Alterna la visibilidad del contenedor desplegable animando la rotación del botón chevron.
 func _on_chevron_pressed() -> void:
 	var esta_visible = contenedor_desplegable.visible
 	contenedor_desplegable.visible = !esta_visible
 	
-	# Rotación del botón flecha usando Tween para un toque premium
 	var tween = create_tween()
 	var angulo_destino = 180.0 if !esta_visible else 0.0
 	tween.tween_property(boton_chevron, "rotation_degrees", angulo_destino, 0.25).set_trans(Tween.TRANS_SINE)
 
+## Establece la cápsula activa y transiciona a la escena de lectura y estudio de conceptos.
 func _on_estudiar_pressed() -> void:
 	CapsulaManager.capsula_activa_id = id_capsula
 	get_tree().change_scene_to_file("res://src/gameplay/study_stage/escena_estudio.tscn")
 
+## Establece la cápsula activa y abre la tienda LSG si está autenticado, o inicia directamente la partida.
 func _on_practicar_pressed() -> void:
 	CapsulaManager.capsula_activa_id = id_capsula
 	
 	if LsgAuth.logged_in:
-		# Instanciamos la tienda pre-partida y la agregamos sobre el selector de cápsulas
 		var tienda_escena = load("res://src/ui/store/tienda_lsg.tscn")
 		var tienda_instancia = tienda_escena.instantiate()
 		tienda_instancia.name = "TiendaLSG"

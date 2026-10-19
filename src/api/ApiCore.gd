@@ -1,10 +1,19 @@
 extends Node
+## Administrador central de comunicación con el backend principal de LSG (LSG-Core-API).
+## Gestiona el ciclo de vida de la sesión de juego remota, la consulta de saldos y atributos
+## multidimensionales, el canje de ventajas (mecánicas modificables) y el ajuste de puntos.
 
+## Emitida al iniciar exitosamente una sesión remota de juego, indicando el session_id asignado.
 signal session_started(session_id: int)
+## Emitida al finalizar la sesión remota de juego en el backend.
 signal session_ended
+## Emitida al concluir una solicitud de canje de puntos por una ventaja (éxito o fallo).
 signal redeem_completed(success: bool, response_data: Dictionary)
+## Emitida cuando se cargan los saldos de puntos indexados por dimensión.
 signal balance_loaded(balances: Array)
+## Emitida cuando se reciben los atributos y balances multidimensionales del jugador.
 signal attributes_loaded(attributes: Array)
+## Emitida al finalizar una petición de ajuste/acreditación de puntos.
 signal adjust_completed(success: bool, response_data: Dictionary)
 
 const BASE_URL = "https://lsg.diinf.usach.cl/lsg-core-api"
@@ -20,6 +29,7 @@ var active_mechanics: Dictionary = {
 	"ciberseguro": false
 }
 
+## Restablece a falso todas las ventajas adquiridas en la tienda para la ronda.
 func reset_active_mechanics() -> void:
 	active_mechanics = {
 		"salvavidas": false,
@@ -33,17 +43,15 @@ func reset_active_mechanics() -> void:
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	# Evitamos el cierre inmediato de la aplicación para poder reportar el fin de sesión
 	get_tree().set_auto_accept_quit(false)
-	
-	# Escuchamos los eventos de login para iniciar sesión automáticamente
 	LsgAuth.login_success.connect(_on_user_login_success)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		_clean_up_and_exit()
+		clean_up_and_exit()
 
-func _clean_up_and_exit() -> void:
+## Realiza el procedimiento ordenado de salida: envía telemetría pendiente, cierra sesión y sale.
+func clean_up_and_exit() -> void:
 	print("LSG-Core: Detectado intento de cierre del juego.")
 	if LsgLogger.is_active:
 		print("LSG-Core: Enviando reporte de telemetria acumulado antes de salir...")
@@ -53,12 +61,13 @@ func _clean_up_and_exit() -> void:
 		await end_session()
 	get_tree().quit()
 
-# Inicia la sesión global del juego cuando el usuario se loguea
+## Inicia la sesión remota, activa el registrador de telemetría y reenvía reportes offline tras el login.
 func _on_user_login_success(_username: String) -> void:
-	start_session()
+	await start_session()
 	LsgLogger.start_session()
+	LsgLogger.flush_offline_buffer()
 
-# Petición para INICIAR la sesión global
+## Envía la petición HTTP para registrar una nueva sesión de juego en el backend de LSG.
 func start_session() -> void:
 	if not LsgAuth.logged_in or LsgAuth.access_token.is_empty():
 		print("LSG-Core: No se puede iniciar sesión de juego sin usuario autenticado.")
@@ -103,7 +112,7 @@ func start_session() -> void:
 	else:
 		print("LSG-Core: Falló inicio de sesión de juego en API (Código ", response_code, ").")
 
-# Petición para TERMINAR la sesión global
+## Envía la petición PATCH para finalizar la sesión activa de juego en el backend.
 func end_session() -> void:
 	if active_session_id == -1:
 		return
@@ -137,7 +146,7 @@ func end_session() -> void:
 	active_session_id = -1
 	session_ended.emit()
 
-# Consultar balance de puntos multidimensional
+## Consulta el balance actual de puntos multidimensionales del jugador.
 func get_points_balance() -> void:
 	if not LsgAuth.logged_in:
 		return
@@ -164,7 +173,6 @@ func get_points_balance() -> void:
 		var json = JSON.new()
 		if json.parse(body.get_string_from_utf8()) == OK:
 			var balances = json.data as Array
-			# Poblar dinámicamente el mapeo de códigos de dimensión en el logger
 			for item in balances:
 				if item is Dictionary:
 					var dim_id = int(item.get("id_point_dimension", -1))
@@ -177,7 +185,7 @@ func get_points_balance() -> void:
 	else:
 		print("LSG-Core: Error al cargar balances (Código ", response_code, ").")
 
-# Realizar canje de puntos por mecánicas modificables
+## Ejecuta la petición de canje de puntos por una ventaja específica (mecánica modificable).
 func redeem_mechanic(mechanic_id: int, dimension_id: int, amount: int) -> void:
 	if not LsgAuth.logged_in:
 		redeem_completed.emit(false, {"error": "Usuario no autenticado"})
@@ -224,7 +232,7 @@ func redeem_mechanic(mechanic_id: int, dimension_id: int, amount: int) -> void:
 		print("LSG-Core: Error de canje en el servidor (Codigo ", response_code, "): ", response_data)
 		redeem_completed.emit(false, response_data)
 
-# Consultar puntos y atributos multidimensionales del jugador
+## Consulta la lista detallada de atributos y puntos multidimensionales del jugador.
 func get_attributes_points() -> void:
 	if not LsgAuth.logged_in:
 		return
@@ -257,7 +265,7 @@ func get_attributes_points() -> void:
 	else:
 		print("LSG-Core: Error al cargar atributos/puntos (Código ", response_code, ").")
 
-# Cargar puntos mediante API
+## Ajusta (abona o debita) puntos en una dimensión específica para el jugador autenticado.
 func adjust_points(attribute_id: int, direction: String, amount: int, reason: String) -> void:
 	if not LsgAuth.logged_in:
 		adjust_completed.emit(false, {"error": "Usuario no autenticado"})
@@ -308,6 +316,7 @@ func adjust_points(attribute_id: int, direction: String, amount: int, reason: St
 		print("LSG-Core: Error de ajuste de puntos en el servidor (Codigo ", response_code, "): ", response_data)
 		adjust_completed.emit(false, response_data)
 
+## Helper interno para instanciar y configurar el nodo HTTPRequest con soporte TLS.
 func _crear_http(url: String) -> HTTPRequest:
 	var http = HTTPRequest.new()
 	http.process_mode = Node.PROCESS_MODE_ALWAYS

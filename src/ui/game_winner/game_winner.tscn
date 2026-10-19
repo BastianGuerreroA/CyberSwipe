@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://bqasrlqrmndwy"]
+[gd_scene load_steps=7 format=3 uid="uid://bqasrlqrmndwy"]
 
 [ext_resource type="Theme" uid="uid://dndsbs88ttxmu" path="res://resources/themes/MenuPrincipal_Theme.tres" id="1_d5v2h"]
 [ext_resource type="Script" uid="uid://d33yb0o2ude50" path="res://src/ui/game_winner/game_winner.gd" id="2_u5476"]
-[ext_resource type="Theme" uid="uid://c1nsvuunjifsk" path="res://resources/themes/botonesMenuPrincipal.tres" id="3_fxcxu"]
 [ext_resource type="PackedScene" uid="uid://ws6ctwd7ok53" path="res://src/ui/capsula_selector/capsula_selector.tscn" id="3_u5476"]
+[ext_resource type="Theme" uid="uid://c1nsvuunjifsk" path="res://resources/themes/botonesMenuPrincipal.tres" id="3_fxcxu"]
+[ext_resource type="Texture2D" uid="uid://bfunvlk0h5dda" path="res://assets/IconosPixelArt/Estrella_Puntaje.png" id="4_estrella"]
+[ext_resource type="Texture2D" uid="uid://cm8q3x47k1rql" path="res://assets/IconosPixelArt/RelojPixelArt.png" id="5_reloj"]
 
 [node name="Game_Winer" type="Control"]
 process_mode = 3
@@ -26,60 +28,146 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -290.0
-offset_top = -300.0
+offset_top = -345.0
 offset_right = 290.0
-offset_bottom = 300.0
+offset_bottom = 345.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_type_variation = &"Panel_Game_Winner"
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
 layout_mode = 2
 theme = ExtResource("3_fxcxu")
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
 
 [node name="TituloMenu" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 54
 text = "YOU WIN"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="ContenedorEstadisticas" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PanelPuntaje" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas"]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelPuntaje"]
 layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelPuntaje/MarginContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="Puntaje" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="IconoPuntaje" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelPuntaje/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_estrella")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Puntaje" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelPuntaje/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 26
 text = "Puntaje:"
 vertical_alignment = 1
 
-[node name="ValorPuntaje" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="ValorPuntaje" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelPuntaje/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 26
 text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PanelTiempo" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelTiempo"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelTiempo/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="IconoTiempo" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelTiempo/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("5_reloj")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tiempo" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelTiempo/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Tiempo:"
+vertical_alignment = 1
+
+[node name="ValorTiempo" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/ContenedorEstadisticas/PanelTiempo/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 1, 0.815686, 1)
+theme_override_font_sizes/font_size = 26
+text = "00:00.00"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="LabelDetallePenalizacion" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "🌟 ¡RONDA PERFECTA! (0 Fallos)"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="HBoxRecords" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Record" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxRecords"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 19
+text = "Récord: 0 pts"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Record" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="RecordTiempo" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxRecords"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Record : 0"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 19
+text = "Mejor: --:--"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeNuevoRecord" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "⚡ ¡NUEVO RÉCORD DE VELOCIDAD!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -89,41 +177,41 @@ layout_mode = 2
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelFeedback"]
 layout_mode = 2
 theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
+theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
+theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelFeedback/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
 [node name="TituloLogro" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelFeedback/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 1, 0.81568627, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 20
 text = "¡Nivel Superado!"
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="Consejo" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelFeedback/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 17
 text = "Consejo de victoria..."
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="Reintentar" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 54)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 focus_mode = 0
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 text = "Reintentar"
 
 [node name="ExitGame" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 54)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 focus_mode = 0
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 text = "Salir"
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/Reintentar" to="." method="_on_reintentar_pressed"]

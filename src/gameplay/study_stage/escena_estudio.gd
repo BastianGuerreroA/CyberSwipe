@@ -1,4 +1,7 @@
 extends Control
+## Vista formativa de lectura y aprendizaje conceptual (Study Stage).
+## Presenta los contenidos teóricos y buenas prácticas de ciberseguridad asociadas a la cápsula
+## seleccionada antes de que el jugador ingrese a la etapa de toma de decisiones.
 
 @onready var label_etapa = $PanelContainer/MarginContainer/VBoxContainer/HeaderContainer/HBoxContainer/LabelEtapa
 @onready var label_titulo = $PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/VBoxScrollContent/TitlePanel/MarginContainer/VBoxContainer/LabelTitulo
@@ -9,38 +12,31 @@ extends Control
 @onready var scroll_container = $PanelContainer/MarginContainer/VBoxContainer/ScrollContainer
 @onready var musica_fondo = $MusicaFondo
 
-# Variables para soporte de arrastre táctil en móviles
 var arrastrando_scroll: bool = false
 var ultimo_pos_y: float = 0.0
 
 func _ready() -> void:
 	boton_volver.pressed.connect(_on_volver_pressed)
 	
-	# Asegurar bucle infinito de música de fondo
 	if not musica_fondo.finished.is_connected(_on_musica_finished):
 		musica_fondo.finished.connect(_on_musica_finished)
 	
-	# Garantizar que el texto no bloquee los eventos de deslizamiento táctil
 	rich_text_contenido.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# Cargar los datos de la cápsula activa
 	var id_capsula = CapsulaManager.capsula_activa_id
 	var datos_capsula = CapsulaManager.obtener_capsula(id_capsula)
 	if not datos_capsula.is_empty():
-		# 1. Configurar etapa y textos
 		label_etapa.text = "📖 ETAPA " + str(id_capsula) + ": ESTUDIAR"
 		label_titulo.text = datos_capsula.get("titulo", "Cápsula de Estudio")
 		label_subtitulo.text = datos_capsula.get("subtitulo", "")
 		rich_text_contenido.text = datos_capsula.get("contenido_estudio", "")
-		
-		# 2. Configurar icono de la cápsula dinámicamente (garantizado en APK exportada)
 		icon_rect.texture = CapsulaManager.obtener_icono_capsula(id_capsula)
 
 func _on_musica_finished() -> void:
 	musica_fondo.play()
 
+## Permite el desplazamiento vertical del contenido mediante arrastre táctil o ratón.
 func _input(event: InputEvent) -> void:
-	# Soporte universal de deslizamiento táctil (pantalla táctil / mouse)
 	if event is InputEventScreenTouch or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
 		if event.pressed:
 			arrastrando_scroll = true
@@ -53,6 +49,6 @@ func _input(event: InputEvent) -> void:
 		scroll_container.scroll_vertical += int(delta_y)
 		ultimo_pos_y = event.position.y
 
+## Retorna a la interfaz de selección de cápsulas.
 func _on_volver_pressed() -> void:
-	# Regresar a la escena de selección de cápsulas
 	get_tree().change_scene_to_file("res://src/ui/capsula_selector/capsula_selector.tscn")

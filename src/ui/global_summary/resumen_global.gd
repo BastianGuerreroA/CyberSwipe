@@ -1,4 +1,7 @@
 extends Control
+## Vista final de resumen global y certificación formativa de competencias.
+## Consolida los resultados acumulados de todas las cápsulas, calcula porcentajes de logro
+## frente al total teórico posible y emite un diagnóstico cualitativo de competencias en ciberseguridad.
 
 @export var escena_capsulas: PackedScene = preload("res://src/ui/capsula_selector/capsula_selector.tscn")
 @export var escena_menu: PackedScene = preload("res://src/ui/main_menu/menu_principal.tscn")
@@ -25,7 +28,7 @@ func _ready() -> void:
 	if musica_fondo:
 		if not musica_fondo.finished.is_connected(_on_musica_finished):
 			musica_fondo.finished.connect(_on_musica_finished)
-		musica_fondo.volume_db = -10.0 # Música suave de fondo
+		musica_fondo.volume_db = -10.0
 		musica_fondo.play()
 	
 	_cargar_datos_resumen()
@@ -34,6 +37,7 @@ func _on_musica_finished() -> void:
 	if musica_fondo:
 		musica_fondo.play()
 
+## Permite el desplazamiento táctil de la lista de desglose en dispositivos móviles.
 func _input(event: InputEvent) -> void:
 	if not is_inside_tree() or not visible:
 		return
@@ -52,8 +56,8 @@ func _input(event: InputEvent) -> void:
 		scroll_container.scroll_vertical += int(delta_y)
 		ultimo_pos_y = event.position.y
 
+## Carga y totaliza las métricas de rendimiento por cápsula y genera las tarjetas de desglose.
 func _cargar_datos_resumen() -> void:
-	# 1. Calcular el total máximo de puntos posibles sumando la cantidad de cartas de cada cápsula
 	var max_puntos_posibles: int = 0
 	for cap in CapsulaManager.lista_capsulas:
 		var cartas_array = cap.get("cartas", [])
@@ -68,7 +72,6 @@ func _cargar_datos_resumen() -> void:
 	label_puntos_totales.text = str(puntos) + " / " + str(max_puntos_posibles) + " PTS"
 	label_progreso.text = str(completadas) + " / " + str(total_capsulas) + " (" + str(porcentaje) + "%)"
 	
-	# 2. Rellenar desglose por cápsula
 	for child in contenedor_desglose.get_children():
 		child.queue_free()
 		
@@ -117,9 +120,9 @@ func _cargar_datos_resumen() -> void:
 		
 		contenedor_desglose.add_child(item_panel)
 		
-	# 3. Diagnóstico Cualitativo de Competencias
 	_generar_diagnostico_cualitativo(puntos, max_puntos_posibles, completadas, total_capsulas)
 
+## Redacta el dictamen formativo según porcentaje de acierto y avance del programa.
 func _generar_diagnostico_cualitativo(puntos: int, max_posibles: int, completadas: int, total: int) -> void:
 	if completadas >= total and total > 0:
 		var porcentaje_aciertos = (float(puntos) / float(max(max_posibles, 1))) * 100.0
@@ -134,8 +137,10 @@ func _generar_diagnostico_cualitativo(puntos: int, max_posibles: int, completada
 		label_diagnostico_titulo.text = "DIAGNOSTICO: EN PROCESO DE APRENDIZAJE"
 		label_diagnostico_texto.text = "Has avanzado en el programa de capacitacion. Continua completando los niveles pendientes para certificar tus competencias en ciberseguridad corporativa."
 
+## Vuelve al selector de cápsulas para reintentar niveles.
 func _on_repasar_pressed() -> void:
 	get_tree().change_scene_to_packed(escena_capsulas)
 
+## Regresa a la pantalla del menú principal del juego.
 func _on_menu_pressed() -> void:
 	get_tree().change_scene_to_packed(escena_menu)

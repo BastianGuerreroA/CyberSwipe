@@ -1,13 +1,14 @@
 extends Control
+## Interfaz de usuario para autenticación de jugadores con LSG (Learning Serious Games).
+## Controla la apertura/cierre animado del modal, el envío de credenciales mediante ApiAuth,
+## la retroalimentación visual de errores y el despliegue del estado de sesión activa.
 
 @onready var panel = $PanelLogin
 @onready var boton_lsg = $BotonLSG
 
-# Referencias a contenedores principales
 @onready var formulario_login = $PanelLogin/MarginContainer/VBoxContainer/FormularioLogin
 @onready var info_sesion = $PanelLogin/MarginContainer/VBoxContainer/InfoSesion
 
-# Referencias a componentes del formulario
 @onready var input_usuario = $PanelLogin/MarginContainer/VBoxContainer/FormularioLogin/InputUsuario
 @onready var input_clave = $PanelLogin/MarginContainer/VBoxContainer/FormularioLogin/InputClave
 @onready var boton_iniciar = $PanelLogin/MarginContainer/VBoxContainer/FormularioLogin/Button
@@ -17,15 +18,13 @@ extends Control
 func _ready() -> void:
 	panel.visible = false
 	
-	# Conectamos las señales globales de autenticación
 	LsgAuth.login_success.connect(_on_lsg_login_success)
 	LsgAuth.login_failed.connect(_on_lsg_login_failed)
 	LsgAuth.logged_out.connect(_on_lsg_logged_out)
 	
-	# Inicializamos el estado visual del panel según si ya existe sesión
 	_actualizar_interfaz_sesion()
 
-# Abrir panel
+## Abre el panel modal de login con animación de escala y desvanecimiento.
 func _on_boton_lsg_pressed() -> void:
 	panel.visible = true
 	boton_lsg.visible = false
@@ -39,12 +38,12 @@ func _on_boton_lsg_pressed() -> void:
 	
 	_actualizar_interfaz_sesion()
 
-# Cerrar panel
+## Cierra el panel de login y restaura la visibilidad del botón de acceso.
 func _on_boton_cerrar_pressed() -> void:
 	panel.visible = false
 	boton_lsg.visible = true
 
-# Presionar Iniciar Sesión
+## Valida los campos del formulario y despacha la petición de autenticación a ApiAuth.
 func _on_iniciar_sesion_pressed() -> void:
 	var email = input_usuario.text.strip_edges()
 	var password = input_clave.text.strip_edges()
@@ -60,11 +59,11 @@ func _on_iniciar_sesion_pressed() -> void:
 	
 	LsgAuth.login(email, password)
 
-# Presionar Cerrar Sesión
+## Despacha la solicitud de desautenticación a ApiAuth.
 func _on_boton_cerrar_sesion_pressed() -> void:
 	LsgAuth.logout()
 
-# Cambiar elementos de la interfaz dependiendo de si el usuario está logueado
+## Alterna entre la vista de formulario de acceso o ficha de bienvenida según si el usuario está autenticado.
 func _actualizar_interfaz_sesion() -> void:
 	if LsgAuth.logged_in:
 		label_bienvenida.text = "Bienvenido,\n" + LsgAuth.player_name
@@ -76,11 +75,9 @@ func _actualizar_interfaz_sesion() -> void:
 		info_sesion.visible = false
 		label_error.visible = false
 		
-		# Asegurar que el botón esté habilitado y con su texto original
 		boton_iniciar.disabled = false
 		boton_iniciar.text = "INICIAR SESIÓN"
 
-# Callbacks de señales globales
 func _on_lsg_login_success(_username: String) -> void:
 	_actualizar_interfaz_sesion()
 

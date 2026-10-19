@@ -1,4 +1,7 @@
 extends Control
+## Controlador del menú principal del juego (Main Menu).
+## Gestiona la música de ambientación, el indicador visual de sincronización de contenido remoto
+## y el despliegue del badge de estado de conexión/modo offline.
 
 @onready var music_menu: AudioStreamPlayer = $MusicMenu
 @onready var contenedor_botones: VBoxContainer = $MarginContainer/VBoxContainer
@@ -11,17 +14,18 @@ func _ready() -> void:
 		music_menu.finished.connect(_on_music_finished)
 	music_menu.play()
 	
-	# Escuchar eventos de sincronización de GitHub
 	if not ContentManager.content_sync_completed.is_connected(_on_content_sync_completed):
 		ContentManager.content_sync_completed.connect(_on_content_sync_completed)
 		
 	_actualizar_estado_interfaz()
 
+## Anima la rotación del icono spinner mientras se descargan contenidos en segundo plano.
 func _process(delta: float) -> void:
 	if contenedor_cargando and contenedor_cargando.visible and icono_spinner:
 		icono_spinner.pivot_offset = icono_spinner.size / 2.0
 		icono_spinner.rotation += delta * 6.0
 
+## Alterna entre la vista de botones o spinner de carga y notifica el tiempo de carga a PerformanceLogger.
 func _actualizar_estado_interfaz() -> void:
 	if ContentManager.is_syncing:
 		contenedor_botones.visible = false

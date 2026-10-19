@@ -1,19 +1,10 @@
 extends Node
-
+## Administrador criptográfico para descifrar cápsulas educativas (.lsg).
+## Implementa descifrado AES-256-CBC con relleno PKCS#7 a partir de datos binarios
+## generados por la herramienta de cifrado offline.
 ##
-## CryptoManager
-##
-## Descifra archivos .lsg generados por encrypt_capsule.py
-## Algoritmo:
-##
-## AES-256-CBC
-## PKCS7
-##
-## Formato del archivo:
-##
-## [16 bytes IV]
-## [CipherText]
-##
+## Formato del archivo binario .lsg:
+## [16 bytes IV][Texto cifrado...]
 
 var AES_KEY: PackedByteArray = PackedByteArray([
 	216,159,99,164,211,178,86,149,
@@ -22,135 +13,68 @@ var AES_KEY: PackedByteArray = PackedByteArray([
 	65,240,188,83,95,84,161,42
 ])
 
-
-############################################################
-# API PÚBLICA
-############################################################
-
-func load_capsule(path:String) -> Dictionary:
+## Carga y descifra el archivo de una cápsula educativa retornando su estructura JSON como Dictionary.
+func load_capsule(path: String) -> Dictionary:
 	return _load_json(path)
 
-
-func load_index(path:String) -> Dictionary:
+## Carga y descifra el archivo de índice general de contenido (index.lsg).
+func load_index(path: String) -> Dictionary:
 	return _load_json(path)
 
-
-
-############################################################
-# CARGAR ARCHIVO
-############################################################
-
-func _load_json(path:String) -> Dictionary:
-
+## Lee los bytes crudos del archivo en disco y delega su descifrado.
+func _load_json(path: String) -> Dictionary:
 	if !FileAccess.file_exists(path):
 		push_error("CryptoManager -> No existe: " + path)
 		return {}
 
 	var encrypted := FileAccess.get_file_as_bytes(path)
-
 	if encrypted.is_empty():
 		push_error("CryptoManager -> Archivo vacío.")
 		return {}
 
 	return _decrypt(encrypted)
 
-
-
-############################################################
-# DESCIFRADO AES
-############################################################
-
-func _decrypt(file_bytes:PackedByteArray) -> Dictionary:
-
+## Descifra el buffer binario AES-256-CBC extrayendo el IV inicial y parseando el texto plano resultante.
+func _decrypt(file_bytes: PackedByteArray) -> Dictionary:
 	if file_bytes.size() <= 16:
 		push_error("CryptoManager -> Archivo inválido.")
 		return {}
 
-	#--------------------------------------
-	# IV
-	#--------------------------------------
-
-	var iv:PackedByteArray = file_bytes.slice(0,16)
-
-	#--------------------------------------
-	# CipherText
-	#--------------------------------------
-
-	var ciphertext:PackedByteArray = file_bytes.slice(16)
-
-	#--------------------------------------
-	# AES
-	#--------------------------------------
+	var iv: PackedByteArray = file_bytes.slice(0, 16)
+	var ciphertext: PackedByteArray = file_bytes.slice(16)
 
 	var aes := AESContext.new()
-
-	var err := aes.start(
-		AESContext.MODE_CBC_DECRYPT,
-		AES_KEY,
-		iv
-	)
-
+	var err := aes.start(AESContext.MODE_CBC_DECRYPT, AES_KEY, iv)
 	if err != OK:
 		push_error("CryptoManager -> Error AES start().")
 		return {}
 
 	var decrypted := aes.update(ciphertext)
-
 	aes.finish()
 
-	#--------------------------------------
-	# PKCS7
-	#--------------------------------------
-
 	decrypted = _remove_padding(decrypted)
-
-	#--------------------------------------
-	# UTF8
-	#--------------------------------------
-
 	var json_text := decrypted.get_string_from_utf8()
 
-	#--------------------------------------
-	# JSON
-	#--------------------------------------
-
 	var json := JSON.new()
-
 	err = json.parse(json_text)
-
 	if err != OK:
-
 		push_error(
 			"CryptoManager -> JSON inválido.\n" +
 			json.get_error_message() +
 			"\nLínea: " +
 			str(json.get_error_line())
 		)
-
 		return {}
 
 	return json.data
 
-
-
-############################################################
-# REMOVER PKCS7
-############################################################
-
-func _remove_padding(data:PackedByteArray)->PackedByteArray:
-
+## Remueve el relleno PKCS#7 del buffer de bytes descifrado según el último byte.
+func _remove_padding(data: PackedByteArray) -> PackedByteArray:
 	if data.is_empty():
 		return data
 
-	var padding := data[data.size()-1]
-
-	if padding <= 0:
+	var padding := data[data.size() - 1]
+	if padding <= 0 or padding > 16:
 		return data
 
-	if padding > 16:
-		return data
-
-	return data.slice(
-		0,
-		data.size()-padding
-	)
+	return data.slice(0, data.size() - padding)

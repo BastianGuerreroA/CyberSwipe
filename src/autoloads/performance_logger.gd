@@ -1,6 +1,7 @@
 extends Node
-
-# PerformanceLogger Singleton (Autoload)
+## Registrador singleton de rendimiento y métricas energéticas (Autoload).
+## Realiza muestreo periódico (FPS, tiempos de cuadro, memoria) y telemetría de batería en Android
+## a través de la API BatteryManager, exportando los datos en formato CSV (muestras y resumen consolidado).
 
 const LOG_FILE_PATH := "user://performance_log.csv"
 const SUMMARY_FILE_PATH := "user://performance_summary.csv"
@@ -49,7 +50,7 @@ func _ready() -> void:
 	_initial_battery_energy_wh = _get_battery_energy_counter()
 
 
-# Inicializa BatteryManager en Android
+## Inicializa la conexión con BatteryManager en Android mediante JavaClassWrapper.
 func _initialize_android_metrics() -> void:
 	if OS.get_name() != "Android":
 		return
@@ -86,7 +87,7 @@ func _initialize_android_metrics() -> void:
 		_android_battery_manager = null
 
 
-# Crea el CSV de muestras
+## Inicializa y escribe la cabecera del archivo CSV de muestras temporales.
 func _abrir_archivo_log() -> void:
 	_file_log = FileAccess.open(
 		LOG_FILE_PATH,
@@ -115,7 +116,7 @@ func _process(delta: float) -> void:
 		_registrar_muestra()
 
 
-# Registra el tiempo de carga inicial
+## Registra el tiempo de carga transcurrido desde el inicio de la app hasta que la primera escena está lista.
 func mark_initial_load_complete() -> void:
 	if not _is_initial_load_done:
 		_is_initial_load_done = true
@@ -124,7 +125,7 @@ func mark_initial_load_complete() -> void:
 		) / 1000.0
 
 
-# Registra métricas cada segundo
+## Registra periódicamente las métricas de rendimiento y energía en memoria y en el archivo CSV.
 func _registrar_muestra() -> void:
 	var tiempo_seg := _sample_count
 	_sample_count += 1
@@ -213,7 +214,7 @@ func _registrar_muestra() -> void:
 		_file_log.flush()
 
 
-# Obtiene porcentaje de batería
+## Obtiene el porcentaje de batería actual (0.0 - 100.0) a través de Android BatteryManager.
 func _get_battery_percent() -> float:
 	if (
 		OS.get_name() != "Android"
@@ -240,7 +241,7 @@ func _get_battery_percent() -> float:
 	return result
 
 
-# Obtiene carga restante en mAh
+## Obtiene la carga restante de la batería en mAh (miliamperios-hora).
 func _get_battery_charge_counter() -> float:
 	if (
 		OS.get_name() != "Android"
@@ -263,7 +264,7 @@ func _get_battery_charge_counter() -> float:
 	return float(value) / 1000.0
 
 
-# Obtiene corriente instantánea en mA
+## Obtiene la corriente instantánea de la batería en mA (miliamperios).
 func _get_battery_current_now() -> float:
 	if (
 		OS.get_name() != "Android"
@@ -286,7 +287,7 @@ func _get_battery_current_now() -> float:
 	return float(value) / 1000.0
 
 
-# Obtiene energía restante en Wh
+## Obtiene la energía restante de la batería en Wh (vatios-hora).
 func _get_battery_energy_counter() -> float:
 	if (
 		OS.get_name() != "Android"
@@ -317,7 +318,7 @@ func _notification(what: int) -> void:
 		guardar_resumen()
 
 
-# Genera el resumen final
+## Consolida todas las muestras recolectadas y genera el archivo CSV final de resumen de sesión.
 func guardar_resumen() -> void:
 	if _summary_saved:
 		return
@@ -529,7 +530,7 @@ func guardar_resumen() -> void:
 	summary_file.close()
 
 
-# Formatea métricas no disponibles como N/A
+## Formatea un valor numérico de métrica con el formato especificado o retorna 'N/A' si es negativo.
 func _format_metric(value: float, format: String) -> String:
 	if value < 0.0:
 		return "N/A"

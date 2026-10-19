@@ -1,9 +1,15 @@
 extends Node
+## Gestor de autenticación con la API de Learning Serious Games (LSG-Auth).
+## Administra la obtención y validación del JWT, la consulta del perfil del jugador (whoami)
+## y la sincronización del ciclo de vida de la sesión autenticada con los demás módulos.
 
-# Señales globales para notificar cambios de estado
+## Emitida cuando el inicio de sesión es exitoso, transmitiendo el nombre del jugador.
 signal login_success(name: String)
+## Emitida ante fallos de conexión, credenciales incorrectas o respuestas erróneas del backend.
 signal login_failed(error_msg: String)
+## Emitida inmediatamente antes de iniciar el procedimiento de desautenticación.
 signal logging_out
+## Emitida una vez concluido el cierre de sesión local y remoto.
 signal logged_out
 
 # Variables de estado de sesión
@@ -19,15 +25,13 @@ const BASE_URL = "https://lsg.diinf.usach.cl/lsg-auth"
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
-# Función para realizar login
+## Envía las credenciales del usuario (x-www-form-urlencoded) al endpoint /login para solicitar un JWT.
 func login(email: String, password: String) -> void:
 	var url = BASE_URL + "/login"
 	var headers = PackedStringArray(["Content-Type: application/x-www-form-urlencoded"])
 	
-	# Construimos los datos del formulario urlencoded
 	var request_data = "username=" + email.uri_encode() + "&password=" + password.uri_encode()
 	
-	# Instanciamos el nodo HTTP de forma dinámica
 	var http = HTTPRequest.new()
 	http.process_mode = Node.PROCESS_MODE_ALWAYS
 	http.use_threads = true
@@ -65,7 +69,6 @@ func login(email: String, password: String) -> void:
 				access_token = data["access_token"]
 				logged_in = true
 				print("LSG-Auth: Token recibido correctamente.")
-				# Ahora consultamos quiénes somos para obtener el perfil del jugador
 				await fetch_whoami()
 			else:
 				login_failed.emit("Respuesta del servidor inválida (sin token).")
@@ -78,7 +81,7 @@ func login(email: String, password: String) -> void:
 	else:
 		login_failed.emit("Error del servidor (Código " + str(response_code) + ").")
 
-# Obtener información del perfil del jugador
+## Consulta la identidad y roles del jugador autenticado en el endpoint /whoami.
 func fetch_whoami() -> void:
 	if not logged_in or access_token.is_empty():
 		login_failed.emit("No hay sesión activa.")
@@ -122,7 +125,6 @@ func fetch_whoami() -> void:
 			player_email = data.get("email", "")
 			player_roles = data.get("roles", [])
 			
-			# Sincronizamos con el administrador de cápsulas nativo
 			CapsulaManager.nombre_usuario = player_name
 			CapsulaManager.guardar_progreso()
 			
@@ -131,13 +133,11 @@ func fetch_whoami() -> void:
 		else:
 			login_failed.emit("Error al parsear el JSON del perfil.")
 	else:
-		# Si falla la validación del perfil, invalidamos el token
 		logout()
 		login_failed.emit("Error al validar el token del perfil (Código " + str(response_code) + ").")
 
-# Cerrar sesión del usuario localmente
+## Cierra la sesión activa localmente, enviando telemetría pendiente y finalizando la sesión remota.
 func logout() -> void:
-	# Emitimos la señal antes de limpiar el token para que cualquier componente visual se entere
 	logging_out.emit()
 	
 	if LsgLogger.is_active:
@@ -155,7 +155,6 @@ func logout() -> void:
 	player_email = ""
 	player_roles = []
 	
-	# Restauramos al usuario por defecto
 	CapsulaManager.nombre_usuario = "Usuario"
 	CapsulaManager.guardar_progreso()
 	

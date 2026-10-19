@@ -1,5 +1,9 @@
 extends Node
+## Administrador de sincronización y almacenamiento local de cápsulas (.lsg).
+## Garantiza la existencia del directorio local 'user://capsules/', copia las semillas base iniciales
+## y gestiona la descarga y actualización de contenido dinámico desde el repositorio de GitHub.
 
+## Emitida al finalizar el proceso de sincronización con GitHub (indica si fue exitosa).
 signal content_sync_completed(success: bool)
 
 var is_syncing: bool = false
@@ -13,7 +17,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	preparar_directorio_local()
 
-# Garantiza que la carpeta user://capsules/ exista y contenga las semillas iniciales si está vacía
+## Verifica y crea la carpeta 'user://capsules/' si no existe, y copia las semillas iniciales si está vacía.
 func preparar_directorio_local() -> void:
 	var dir_user := DirAccess.open("user://")
 	if dir_user:
@@ -21,11 +25,11 @@ func preparar_directorio_local() -> void:
 			dir_user.make_dir("capsules")
 			print("ContentManager: Creada carpeta de usuario 'user://capsules/'")
 			
-	# Si la carpeta está vacía o no tiene archivos .lsg, copiamos las semillas base desde res://
 	if not _tiene_capsulas_locales():
 		print("ContentManager: La carpeta 'user://capsules/' está vacía. Copiando semillas base desde res://...")
 		_copiar_semillas_base()
 
+## Determina si ya existen archivos .lsg en el almacenamiento del usuario.
 func _tiene_capsulas_locales() -> bool:
 	var dir := DirAccess.open(RUTA_USER_CAPSULAS)
 	if not dir:
@@ -41,7 +45,7 @@ func _tiene_capsulas_locales() -> bool:
 	dir.list_dir_end()
 	return false
 
-# Copia los archivos .lsg predeterminados empaquetados en la app hacia user://capsules/
+## Copia los archivos .lsg empaquetados por defecto en 'res://' hacia la carpeta 'user://' del dispositivo.
 func _copiar_semillas_base() -> void:
 	var dir_res := DirAccess.open(RUTA_RES_CAPSULAS)
 	if not dir_res:
@@ -65,7 +69,7 @@ func _copiar_semillas_base() -> void:
 		file_name = dir_res.get_next()
 	dir_res.list_dir_end()
 
-# Sincroniza y descarga las cápsulas encriptadas (.lsg) desde GitHub
+## Consulta la API de GitHub para descargar y sincronizar cápsulas (.lsg) actualizadas.
 func sincronizar_con_github() -> void:
 	is_syncing = true
 	print("ContentManager: Consultando repositorio de GitHub (BastianGuerreroA/CyberSwipe-Content)...")
@@ -129,12 +133,13 @@ func sincronizar_con_github() -> void:
 	print("ContentManager: Sincronización completada. Se descargaron ", descargados, " cápsulas desde GitHub.")
 	_finalizar_sincronizacion(true)
 
+## Actualiza las banderas de sincronización y emite la señal de término.
 func _finalizar_sincronizacion(success: bool) -> void:
 	is_syncing = false
 	last_sync_success = success
 	content_sync_completed.emit(success)
 
-# Descarga un archivo binario (.lsg) individual desde GitHub y lo guarda en la ruta indicada
+## Descarga un archivo binario individual (.lsg) desde la URL dada y lo persiste en disco.
 func _descargar_un_archivo(url: String, destino: String) -> bool:
 	var http := HTTPRequest.new()
 	http.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -166,3 +171,4 @@ func _descargar_un_archivo(url: String, destino: String) -> bool:
 			print("ContentManager: Descargado y guardado -> ", destino)
 			return true
 	return false
+
