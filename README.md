@@ -1,10 +1,6 @@
 # CyberSwipe
 
 <p align="center">
-  <img src="icon.svg" alt="CyberSwipe Logo" width="128" height="128">
-</p>
-
-<p align="center">
   <strong>Videojuego serio móvil para la concientización y toma de decisiones en ciberseguridad para PYMEs</strong><br>
   <em>Desarrollado en Godot Engine 4 — Universidad de Santiago de Chile (USACH)</em>
 </p>
@@ -20,9 +16,10 @@
 
 ## 📖 Descripción General
 
-**CyberSwipe** es un videojuego serio (*Serious Game*) móvil diseñado para entrenar y concientizar a directivos, colaboradores y profesionales de pequeñas y medianas empresas (PYMEs) en la prevención y respuesta ante incidentes de ciberseguridad.
+**CyberSwipe** es un videojuego serio (*Serious Game*) móvil diseñado para entrenar y concientizar a directivos, colaboradores y profesionales de pequeñas y medianas empresas (PYMEs) en la prevención y respuesta ante incidentes basicos de ciberseguridad.
 
 Inspirado en mecánicas de toma de decisiones rápidas mediante deslizamiento (*swipe* lateral de cartas), el jugador asume el rol del responsable de seguridad informática de una organización. Cada decisión afecta en tiempo real cuatro indicadores críticos:
+
 - **Confidencialidad (C):** Protección de la información sensible contra accesos no autorizados.
 - **Integridad (I):** Exactitud y confiabilidad de los datos y sistemas corporativos.
 - **Disponibilidad (D):** Accesibilidad continua de los servicios y plataformas del negocio.
@@ -38,45 +35,21 @@ Si cualquiera de estos indicadores cae a cero, la organización colapsa y la par
 - 📚 **Cápsulas de Aprendizaje Descargables:** Contenido modular basado en incidentes reales (Phishing, Ransomware, Políticas de Contraseñas, Respaldos, etc.), descargables y actualizables dinámicamente desde GitHub sin reinstalar el juego.
 - 🎯 **Modo Estudio / Inducción:** Pantalla de formación teórica previa al inicio de cada módulo para reforzar conceptos clave antes de la evaluación práctica.
 - ⏱️ **Modo Speedrun / Contrarreloj:** Desafío contrarreloj para cada cápsula, con penalizaciones de tiempo ante respuestas incorrectas y guardado de récords personales.
-- 🛒 **Tienda de Ventajas y Mecánicas Modificables:** Canje de puntos pedagógicos por ventajas de partida (Consultoría Preventiva, Análisis de Impacto predictivo, Subsidio de Seguridad, Ciberseguro Activo y Salvavidas de emergencia).
-- 📊 **Perfil Multidimensional del Jugador:** Diagnóstico y evaluación de competencias en cuatro dimensiones pedagógicas: **Mental**, **Afectivo**, **Social** y **Físico**.
-- 📈 **Telemetría y Monitor de Rendimiento:** Registro detallado de eventos de aprendizaje y métricas de rendimiento del dispositivo (FPS, VRAM, RAM, CPU y Batería) con exportación a CSV para fines de investigación académica.
+- 🛒 **Tienda de Ventajas y Mecánicas Modificables LSG:** Canje de puntos del perfil multidimencional de LSG por ventajas de partida (Consultoría Preventiva, Análisis de Impacto predictivo, Subsidio de Seguridad, Ciberseguro Activo y Salvavidas de emergencia).
 
 ---
 
-## 🌐 Modos de Funcionamiento: Offline vs. Plataforma LSG
-
-CyberSwipe está concebido bajo una arquitectura resiliente que permite operar en dos modalidades según la conectividad del dispositivo:
-
-```
-                  ┌──────────────────────────────────────────────┐
-                  │                 CyberSwipe                   │
-                  │              (Godot Engine 4)                │
-                  └──────┬────────────────────────────────┬──────┘
-                         │                                │
-        [Modo Offline]   │                                │   [Modo Online]
-                         ▼                                ▼
-              ┌─────────────────────┐          ┌──────────────────────┐
-              │ Almacenamiento      │          │ Plataforma LSG       │
-              │ Local (user://)     │          │ (DIINF USACH)        │
-              ├─────────────────────┤          ├──────────────────────┤
-              │ • Semillas base     │          │ • lsg-auth (JWT)     │
-              │ • Progreso .tres    │          │ • lsg-core-api       │
-              │ • Cola offline JSON │◄────────►│ • Sincronización     │
-              └─────────────────────┘ (Flush)  │ • Telemetría remota  │
-                                               └──────────────────────┘
-```
-
 ### 1. Modo Autónomo (Offline)
+
 - **Cero dependencia externa:** El juego incluye semillas base preinstaladas en `res://resources/data/capsules/` que se cargan automáticamente la primera vez que se inicia la aplicación.
 - **Progreso persistente:** El progreso del jugador, estrellas obtenidas, puntajes máximos y récords de tiempo se guardan localmente en `user://progreso_usuario.tres`.
 - **Buffer de telemetría seguro:** Si no hay conexión o el servidor no responde, los eventos y checkpoints pedagógicos se encolan en `user://telemetry_queue.json` y se conservan para su posterior envío.
 
 ### 2. Modo Conectado (Plataforma LSG - DIINF USACH)
+
 - **Autenticación Institucional:** Inicio de sesión con cuenta de la plataforma mediante `lsg-auth` (JWT).
 - **Gestión de Sesiones:** Apertura y cierre formal de sesiones de videojuego con `lsg-core-api` (Game ID: `54`).
-- **Economía de Puntos Pedagógicos:** Consulta del balance acumulado por dimensión formativa y canje transaccional de ventajas en la tienda.
-- **Telemetría Educativa en Tiempo Real:** Emisión automática de registros de interacción y decisiones a la plataforma de investigación educativa.
+- **Telemetría en Tiempo Real:** Emisión automática de registros de interacción y decisiones a la plataforma de investigación educativa LSG.
 - **Sincronización Transaccional (*Flush*):** Al iniciar sesión con conexión, el sistema vacía secuencialmente el buffer offline enviando todas las partidas y checkpoints pendientes.
 
 ---
@@ -84,6 +57,7 @@ CyberSwipe está concebido bajo una arquitectura resiliente que permite operar e
 ## 📱 Requisitos del Sistema
 
 ### Para Jugadores (Dispositivo Móvil Android)
+
 | Componente | Requisito Mínimo | Requisito Recomendado |
 | :--- | :--- | :--- |
 | **Sistema Operativo** | Android 8.0 (Oreo / API 26) | Android 11.0 o superior |
@@ -93,8 +67,8 @@ CyberSwipe está concebido bajo una arquitectura resiliente que permite operar e
 | **Conexión a Internet** | No requerida (juego offline disponible) | Wi-Fi / Datos móviles para sincronización LSG y GitHub |
 
 ### Para Desarrolladores (Entorno de Trabajo)
+
 - **Motor:** [Godot Engine 4.5.1](https://godotengine.org/) (o versión compatible 4.3+).
-- **Sistema Operativo:** Windows 10/11, macOS o Linux.
 - **Control de Versiones:** Git 2.30+.
 - **Herramientas de Exportación Android (Opcional):**
   - Android SDK Command-line Tools y Android SDK Build-Tools (34+).
@@ -106,20 +80,18 @@ CyberSwipe está concebido bajo una arquitectura resiliente que permite operar e
 ## 🚀 Instalación y Ejecución
 
 ### Opción A: Instalación en Dispositivo Android (Jugador)
-1. Descarga el paquete de instalación `CyberSwipe.apk` desde la sección de **Releases** de este repositorio o mediante el enlace provisto por el equipo de investigación.
+
+1. Descarga el paquete de instalación `CyberSwipe.apk` desde la sección de **Releases** de este repositorio o mediante el enlace provisto.
 2. En tu dispositivo Android, habilita la opción de instalar aplicaciones desde **Fuentes Desconocidas** en los ajustes de seguridad del navegador o explorador de archivos.
 3. Abre el archivo `.apk` descargado y confirma la instalación.
-4. Inicia la aplicación y selecciona jugar en modo local o inicia sesión con tu cuenta de la plataforma LSG.
+4. Inicia la aplicación.
 
 ### Opción B: Ejecución desde el Código Fuente (Desarrollador)
-1. Clona el repositorio en tu equipo local:
-   ```bash
-   git clone https://github.com/BastianGuerreroA/cyber-swipe-SeriousGame.git
-   cd cyber-swipe-SeriousGame
-   ```
+
+1. Clona el repositorio en tu equipo local.
 2. Inicia **Godot Engine 4** y pulsa en **Importar**.
 3. Selecciona la carpeta del proyecto y abre el archivo `project.godot`.
-4. Ejecuta el juego presionando la tecla **F5** (o el botón *Reproducir Proyecto* en la esquina superior derecha del editor).
+4. Ejecuta el proyecto del juego.
 
 ---
 
@@ -139,37 +111,10 @@ Si deseas bifurcar (*fork*), personalizar o utilizar tu propio repositorio públ
    - `capsule_001.lsg`, `capsule_002.lsg`, etc.: Archivos binarios cifrados de cada módulo.
 
 2. **Modificar la URL en el código fuente:**
-   Abre el archivo [src/autoloads/content_manager.gd](file:///d:/ProyectosGodot/cyber-swipe/src/autoloads/content_manager.gd) y localiza la constante `GITHUB_API_URL` (alrededor de la línea 14):
-   ```gdscript
-   # Reemplaza 'BastianGuerreroA/CyberSwipe-Content' por tu usuario y repositorio:
-   const GITHUB_API_URL = "https://api.github.com/repos/TU_USUARIO/TU_REPOSITORIO/contents/content"
-   ```
+   Abre el archivo [src/autoloads/content_manager.gd](file:///d:/ProyectosGodot/cyber-swipe/src/autoloads/content_manager.gd) y localiza la constante `GITHUB_API_URL`.
 
 3. **Verificación:**
    Al iniciar el juego con conexión a internet, `ContentManager` consultará la API de tu repositorio, comparará los archivos locales en `user://capsules/` y descargará automáticamente el nuevo contenido sin necesidad de recompilar la aplicación.
-
----
-
-## ⚙️ Configuración de Endpoints de la Plataforma LSG
-
-Los parámetros de integración con los microservicios de la plataforma LSG se encuentran centralizados en los siguientes scripts:
-
-### Autenticación (`LsgAuth`)
-- **Archivo:** [src/api/ApiAuth.gd](file:///d:/ProyectosGodot/cyber-swipe/src/api/ApiAuth.gd)
-- **Constante:**
-  ```gdscript
-  const BASE_URL = "https://lsg.diinf.usach.cl/lsg-auth"
-  ```
-- Endpoints utilizados: `/login`, `/whoami`, `/logout`.
-
-### Núcleo de Sesión y Canjes (`LsgCore`)
-- **Archivo:** [src/api/ApiCore.gd](file:///d:/ProyectosGodot/cyber-swipe/src/api/ApiCore.gd)
-- **Constantes:**
-  ```gdscript
-  const BASE_URL = "https://lsg.diinf.usach.cl/lsg-core-api"
-  const GAME_ID = 54 # Identificador asignado a CyberSwipe en LSG
-  ```
-- Endpoints utilizados: `/videogames/54/sessions`, `/videogames/54/players/{id}/redeem`, `/videogames/54/players/{id}/points/balance`.
 
 ---
 
@@ -214,19 +159,3 @@ cyber-swipe/
 ├── export_presets.cfg         # Configuración de empaquetado para Android
 └── project.godot              # Configuración principal del motor Godot 4
 ```
-
----
-
-## 🎓 Proyecto de Investigación y Tesis
-
-Este videojuego es desarrollado como parte del proyecto de titulación para la carrera de **Ingeniería en Ejecución en Computación e Informática** de la **Universidad de Santiago de Chile (USACH)**, en conjunto con el laboratorio de investigación de **Learning Serious Games (LSG)** del Departamento de Ingeniería Informática (DIINF).
-
-- **Institución:** Universidad de Santiago de Chile (USACH)
-- **Departamento:** Departamento de Ingeniería Informática (DIINF)
-- **Áreas:** Ciberseguridad para PYMEs, Videojuegos Serios, Analítica del Aprendizaje.
-
----
-
-<p align="center">
-  <strong>🛡️ CyberSwipe — Protege la información, equilibra tus recursos y fortalece la seguridad de tu empresa.</strong>
-</p>
