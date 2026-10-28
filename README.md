@@ -8,13 +8,11 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Godot%20Engine-4.5.1-478CBF?logo=godot-engine&logoColor=white" alt="Godot 4.5.1">
   <img src="https://img.shields.io/badge/Plataforma-Android%20%7C%20Desktop-3DDC84?logo=android&logoColor=white" alt="Plataforma">
-  <img src="https://img.shields.io/badge/Integraci%C3%B3n-LSG%20Framework-blue" alt="LSG Framework">
-  <img src="https://img.shields.io/badge/Licencia-Educativa%20%2F%20USACH-orange" alt="Licencia">
 </p>
 
 ---
 
-## 📖 Descripción General
+## Descripción General
 
 **CyberSwipe** es un videojuego serio (*Serious Game*) móvil diseñado para entrenar y concientizar a directivos, colaboradores y profesionales de pequeñas y medianas empresas (PYMEs) en la prevención y respuesta ante incidentes basicos de ciberseguridad.
 
@@ -29,13 +27,13 @@ Si cualquiera de estos indicadores cae a cero, la organización colapsa y la par
 
 ---
 
-## ✨ Características Principales
+## Características Principales
 
-- 🛡️ **Mecánica Dinámica de Swipe:** Evaluación intuitiva de dilemas éticos, técnicos y procedimentales arrastrando cartas a izquierda o derecha.
-- 📚 **Cápsulas de Aprendizaje Descargables:** Contenido modular basado en incidentes reales (Phishing, Ransomware, Políticas de Contraseñas, Respaldos, etc.), descargables y actualizables dinámicamente desde GitHub sin reinstalar el juego.
-- 🎯 **Modo Estudio / Inducción:** Pantalla de formación teórica previa al inicio de cada módulo para reforzar conceptos clave antes de la evaluación práctica.
-- ⏱️ **Modo Speedrun / Contrarreloj:** Desafío contrarreloj para cada cápsula, con penalizaciones de tiempo ante respuestas incorrectas y guardado de récords personales.
-- 🛒 **Tienda de Ventajas y Mecánicas Modificables LSG:** Canje de puntos del perfil multidimencional de LSG por ventajas de partida (Consultoría Preventiva, Análisis de Impacto predictivo, Subsidio de Seguridad, Ciberseguro Activo y Salvavidas de emergencia).
+- **Mecánica Dinámica de Swipe:** Evaluación intuitiva de dilemas éticos, técnicos y procedimentales arrastrando cartas a izquierda o derecha.
+- **Cápsulas de Aprendizaje Descargables:** Contenido modular basado en incidentes reales (Phishing, Ransomware, Políticas de Contraseñas, Respaldos, etc.), descargables y actualizables dinámicamente desde GitHub sin reinstalar el juego.
+- **Modo Estudio / Inducción:** Pantalla de formación teórica previa al inicio de cada módulo para reforzar conceptos clave antes de la evaluación práctica.
+- **Modo Speedrun / Contrarreloj:** Desafío contrarreloj para cada cápsula, con penalizaciones de tiempo ante respuestas incorrectas y guardado de récords personales.
+- **Tienda de Ventajas y Mecánicas Modificables LSG:** Canje de puntos del perfil multidimencional de LSG por ventajas de partida (Consultoría Preventiva, Análisis de Impacto predictivo, Subsidio de Seguridad, Ciberseguro Activo y Salvavidas de emergencia).
 
 ---
 
@@ -54,7 +52,7 @@ Si cualquiera de estos indicadores cae a cero, la organización colapsa y la par
 
 ---
 
-## 📱 Requisitos del Sistema
+## Requisitos del Sistema
 
 ### Para Jugadores (Dispositivo Móvil Android)
 
@@ -77,7 +75,7 @@ Si cualquiera de estos indicadores cae a cero, la organización colapsa y la par
 
 ---
 
-## 🚀 Instalación y Ejecución
+## Instalación y Ejecución
 
 ### Opción A: Instalación en Dispositivo Android (Jugador)
 
@@ -95,7 +93,7 @@ Si cualquiera de estos indicadores cae a cero, la organización colapsa y la par
 
 ---
 
-## 📦 Sincronización y Cambio de Repositorio de Contenido
+## Sincronización y Cambio de Repositorio de Contenido
 
 CyberSwipe desacopla el contenido educativo del binario del juego mediante la clase `ContentManager`. Las cápsulas educativas están empaquetadas en formato cifrado `.lsg` (AES-256-CBC con padding PKCS7) para preservar la integridad pedagógica de las evaluaciones.
 
@@ -118,7 +116,7 @@ Si deseas bifurcar (*fork*), personalizar o utilizar tu propio repositorio públ
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```plaintext
 cyber-swipe/
